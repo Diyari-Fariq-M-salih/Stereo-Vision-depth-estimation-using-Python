@@ -86,6 +86,17 @@ class StereoCalibration:
                 self._imgpoints_right.append(right_corners)
                 success += 1
 
+            # 🔍 Save corner-visualized images (optional)
+            os.makedirs(os.path.join(self.input_path, "corners", "left"), exist_ok=True)
+            os.makedirs(os.path.join(self.input_path, "corners", "right"), exist_ok=True)
+
+            left_vis = cv2.drawChessboardCorners(left.copy(), self.chessboard_size, left_corners, True)
+            right_vis = cv2.drawChessboardCorners(right.copy(), self.chessboard_size, right_corners, True)
+
+            cv2.imwrite(os.path.join(self.input_path, "corners", "left", os.path.basename(left_path)), left_vis)
+            cv2.imwrite(os.path.join(self.input_path, "corners", "right", os.path.basename(right_path)), right_vis)
+
+
         self._image_size = (left.shape[1], left.shape[0])
         print(f"[INFO] Chessboard detected in {success}/{len(self._left_image_paths)} stereo pairs.")
 
