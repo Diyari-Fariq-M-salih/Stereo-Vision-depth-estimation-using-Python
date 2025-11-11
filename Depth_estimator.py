@@ -3,7 +3,7 @@ stereo_depth_estimation.py
 --------------------------
 Compute disparity and approximate depth using stereo images.
 Before running:
-  pip install opencv-python numpy
+  pip install opencv-python numpy tqdm
 """
 
 import cv2
@@ -19,3 +19,5 @@ right_image_path = "right.jpg"
 # f = focal length of the camera
 # B = baseline (distance between cameras)
 # d = disparity (difference in pixel coordinates of the same point in both images)
+
+# calibration done using Stereo_calibration_Driver.py, now we can resume depth estimation
