@@ -94,33 +94,26 @@ class StereoCalibration:
         return chessboard_points
 
     def create_2d_chessboard_points(self, image: np.ndarray) -> np.ndarray:
-        """Create 2D chessboard points for a given image and chessboard size.
+        """Improved version with rotation and better detection."""
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = cv2.equalizeHist(gray)  # enhance contrast
 
-        Parameters
-        ----------
-        image : np.ndarray
-            image of chessboard
+        # Rotate the image to landscape orientation if needed
+        if gray.shape[0] > gray.shape[1]:  # taller than wide
+            gray = cv2.rotate(gray, cv2.ROTATE_90_CLOCKWISE)
 
-        Returns
-        -------
-        np.ndarray
-            Nx1x2 array of 2D points: N = number of corners found in the image
-        """
-        # termination criteria
-        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-        # find chessboard corners
-        found, corners = cv2.findChessboardCorners(image, self.chessboard_size, None)
+        flags = cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE
+        found, corners = cv2.findChessboardCorners(gray, self.chessboard_size, flags)
+
         if not found:
             return None
-        # refine corner positions
-        corners = cv2.cornerSubPix(
-            cv2.cvtColor(image, cv2.COLOR_BGR2GRAY),
-            corners,
-            (11, 11),
-            (-1, -1),
-            criteria,
-        )
+
+        # Refine corner accuracy
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        corners = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
         return corners
+
+
 
     def plot_chessboard(self, image: np.ndarray, corners: np.ndarray) -> np.ndarray:
         """Plot chessboard corners on the image.
